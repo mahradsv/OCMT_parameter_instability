@@ -1,0 +1,55 @@
+function obj = predict_ocmt(y,Z,X,Zf,Xf, pval,delta,deltastar,weight,sel_weight,est_weight) %ppp_weight is from equation 46, 47, and 48 of Pesaran, Pick and Pranovich(2013,JoE)
+
+if nargin < 9
+    weight = 1;
+    sel_weight = false;
+    est_weight = flase;
+end
+if nargin < 10
+    sel_weight = false;
+    est_weight = flase;
+end
+if nargin < 11
+    est_weight = flase;
+end
+
+ind = false(size(X,2),length(weight));
+yf_hat = nan(1,length(weight));
+nvars = nan(1,length(weight));
+
+[T,~]=size(X);
+Z_plus=[ones(T,1),Z]; % add intercept
+maxregthreshold=floor(T);
+for i = 1:length(weight)
+    w = weight(i);
+    if sel_weight
+        [ind_OCMT, ~,~ ,~]=unbalance_OCMT(y ,Z, X , pval,delta,deltastar,w, true,maxregthreshold);
+    else
+        [ind_OCMT, ~,~ ,~]=unbalance_OCMT(y ,Z, X , pval,delta,deltastar,1, true,maxregthreshold);
+    end
+    if all(isnan(ind_OCMT))
+        yf_hat = nan; % Forcast
+        nvars = nan; % number of selected variables
+        nvars_add = nan; % number of selected variables in additional stages
+    else
+        if ~est_weight
+            w = 1;
+        end
+        ind(:,i) = ind_OCMT;
+        set = sum(isnan(X(:,ind(:,i))),2)==0;
+        reg=[Z_plus(set,:),X(set,ind(:,i))]; %X(:,ind),ones(T,1)];
+        yr = y(set);
+        nvars(i) = sum(ind(:,i)); % number of selected variables
+        regf = [1,Zf,Xf(:,ind(:,i))];
+        w_reg = w.^([sum(set)-1:-1:0]').* reg;
+        w_yr = w.^([sum(set)-1:-1:0]').* yr;
+        b = pinv(w_reg'*w_reg)*w_reg'*w_yr; % w_reg\w_yr; 
+        yf_hat(i) = regf*b; % Forcast
+    end
+end
+
+obj.yf_hat = yf_hat;
+obj.ind = ind;
+obj.nvars = nvars;
+
+end

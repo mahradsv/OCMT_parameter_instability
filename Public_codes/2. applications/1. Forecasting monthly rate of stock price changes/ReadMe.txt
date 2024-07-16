@@ -1,0 +1,8 @@
+This folder contains codes and data for the replication of the second empirical application on forecasting monthly rate of price changes of stocks in Dow Jones over the period 01/1980 and 12/2017, presented in "Variable Selection in High Dimensional Linear Regressions with Parameter Instability" version July 2024, by Alexander Chudik , M. Hashem Pesaran, and Mahrad Sharifvaghefi.
+
+The main file to run is predict_main.m in the 'compute_forecasting' subdirectory. This file includes comments that describe the code. This file:
+(i) first loads the constructed monthly Matlab data 'forecasting_final_dataset.mat' from the 'matlab_data' subdirectory (this data is not publicly available), 
+(ii) then compute the results, and
+(iii) save the results in Matlab file named 'Result_expanding_XXXX_weight.mat' where XXXX is either heavy or light depending on the chosen weights. In the paper, for the heavy downweithing, we have weight =[1,0.99,0.98,0.97, 0.96, 0.95] and for light downweighting, we have weight =[1,0.995,0.99,0.985, 0.98, 0.975]. Please note the code needs to be run separately for each selection of the weights. 
+
+Give the forecasting results, The files in 'forecast_result_summary' subdirectory summarized the results. The files named 'summary_all.m' and 'DM_test_results_all.m' can be run to produce the pooled MSFE, MDFA, and DM test results reported in the paper plus some additional information. Moreover the file named 'summary_individual_stocks' and 'DM_test_results_individual_stocks.m' can be run to produce the summary of MSFE, MDFA, and DM test results considering individual stocks separately. 
